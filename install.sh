@@ -30,7 +30,7 @@ need_cmd() {
 
 detect_panel_dir() {
     local explicit="${1:-}"
-    if [[ -n "$explicit" ]]; then
+    if [[ -n "$explicit" && "$explicit" != "--uninstall" && "$explicit" != "-u" ]]; then
         [[ -f "$explicit/artisan" ]] || die "no artisan file found in $explicit"
         printf '%s\n' "$explicit"
         return
@@ -52,6 +52,17 @@ detect_panel_dir() {
             return
         fi
     done
+
+    # If in interactive terminal, prompt the user rather than failing immediately
+    if [[ -t 0 ]]; then
+        printf '[sentri-theme] Pterodactyl directory could not be auto-detected.\n' >&2
+        local manual_path
+        read -rp '[sentri-theme] Please enter the absolute path to your panel: ' manual_path
+        if [[ -f "$manual_path/artisan" ]]; then
+            printf '%s\n' "$manual_path"
+            return
+        fi
+    fi
 
     die "could not detect your Pterodactyl panel path automatically; rerun with: bash install.sh /path/to/panel"
 }
@@ -100,7 +111,7 @@ backup_files() {
     sudo_cmd mkdir -p "$backup_dir"
 
     [[ -f "$panel_dir/resources/views/templates/wrapper.blade.php" ]] && sudo_cmd cp -a "$panel_dir/resources/views/templates/wrapper.blade.php" "$backup_dir/wrapper.blade.php"
-    [[ -d "$panel_dir/public/themes/$THEME_NAME" ]] && sudo_cmd cp -a "$panel_dir/public/themes/$THEME_NAME" "$backup_dir/"
+    [[ -d "$panel_dir/public/themes/$THEME_NAME" ]] && sudo_cmd cp -a "$panel_dir/public/themes/$THEME_NAME" "$backup_dir/" || true
 }
 
 install_theme_css() {
@@ -144,10 +155,29 @@ clear_panel_cache() {
     local panel_dir="$1"
 
     log "clearing Laravel caches"
-    sudo_cmd php "$panel_dir/artisan" view:clear >/dev/null || true
-    sudo_cmd php "$panel_dir/artisan" cache:clear >/dev/null || true
-    sudo_cmd php "$panel_dir/artisan" config:clear >/dev/null || true
-    sudo_cmd php "$panel_dir/artisan" optimize:clear >/dev/null || true
+    
+    # 1. Clean on host if PHP is installed on the host
+    if command -v php >/dev/null 2>&1; then
+        sudo_cmd php "$panel_dir/artisan" view:clear >/dev/null || true
+        sudo_cmd php "$panel_dir/artisan" cache:clear >/dev/null || true
+        sudo_cmd php "$panel_dir/artisan" config:clear >/dev/null || true
+        sudo_cmd php "$panel_dir/artisan" optimize:clear >/dev/null || true
+    else
+        log "PHP command not found on host; skipping host artisan caches."
+    fi
+
+    # 2. Automatically detect if running inside Docker container and clear cache inside
+    if command -v docker >/dev/null 2>&1; then
+        local container
+        container=$(docker ps --format '{{.Names}}' | grep -E 'pterodactyl|panel' | head -n 1 || true)
+        if [[ -n "$container" ]]; then
+            log "detected running Pterodactyl container: $container"
+            log "clearing caches inside the Docker container..."
+            docker exec "$container" php artisan view:clear >/dev/null 2>&1 || true
+            docker exec "$container" php artisan cache:clear >/dev/null 2>&1 || true
+            docker exec "$container" php artisan config:clear >/dev/null 2>&1 || true
+        fi
+    fi
 }
 
 fix_permissions() {
@@ -157,24 +187,71 @@ fix_permissions() {
     fi
 }
 
+uninstall_theme() {
+    local panel_dir="$1"
+    local wrapper="$panel_dir/resources/views/templates/wrapper.blade.php"
+    local theme_dir="$panel_dir/public/themes/$THEME_NAME"
+    local marker="sentri-pterodactyl-dark"
+
+    log "uninstalling theme from $panel_dir"
+    
+    if [[ -f "$wrapper" ]]; then
+        if grep -q "data-theme=\"$marker\"" "$wrapper"; then
+            log "removing stylesheet injection from wrapper.blade.php"
+            local tmp_file
+            tmp_file="$(mktemp "$DEFAULT_TMP_DIR/sentri-wrapper-uninstall.XXXXXX")"
+            grep -v "data-theme=\"$marker\"" "$wrapper" > "$tmp_file"
+            sudo_cmd install -m 0644 "$tmp_file" "$wrapper"
+            rm -f "$tmp_file"
+        else
+            log "no stylesheet injection found in wrapper.blade.php"
+        fi
+    fi
+
+    if [[ -d "$theme_dir" ]]; then
+        log "deleting theme directory: $theme_dir"
+        sudo_cmd rm -rf "$theme_dir"
+    fi
+
+    clear_panel_cache "$panel_dir"
+    log "uninstall complete! Theme has been removed."
+}
+
 main() {
     need_cmd awk
     need_cmd cp
     need_cmd grep
     need_cmd install
     need_cmd mktemp
-    need_cmd php
 
-    if [[ "${EUID}" -ne 0 ]] && ! sudo -n true >/dev/null 2>&1; then
-        die "this installer needs root privileges; rerun with sudo bash install.sh"
+    # Interactively ask for sudo credentials if run as normal user
+    if [[ "${EUID}" -ne 0 ]]; then
+        log "Requesting root privileges... Running script with sudo."
+        exec sudo bash "$0" "$@"
     fi
 
+    local action="install"
+    local target_dir=""
+
+    # Parse command line options
+    for arg in "$@"; do
+        if [[ "$arg" == "--uninstall" || "$arg" == "-u" ]]; then
+            action="uninstall"
+        else
+            target_dir="$arg"
+        fi
+    done
+
     local panel_dir
-    panel_dir="$(detect_panel_dir "${1:-}")"
+    panel_dir="$(detect_panel_dir "$target_dir")"
+
+    if [[ "$action" == "uninstall" ]]; then
+        uninstall_theme "$panel_dir"
+        return
+    fi
 
     local source_dir
     source_dir="$(resolve_source_dir)"
-
     local backup_dir="$BACKUP_ROOT/sentri-theme-backup-$(date +%Y%m%d-%H%M%S)"
 
     log "panel detected at $panel_dir"
