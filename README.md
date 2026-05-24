@@ -1,10 +1,41 @@
 # Sentri Pterodactyl Dark Theme
 
-This repo contains a dark theme inspired by the Sentri design language and tailored for Pterodactyl.
+A Sentri-inspired dark theme for Pterodactyl Panel.
 
-Files:
+## Quick Install
+
+```bash
+curl -sL https://raw.githubusercontent.com/instax-dutta/elden-theme/main/install.sh -o /tmp/sentri-theme.sh && sudo bash /tmp/sentri-theme.sh
+```
+
+If your panel is installed somewhere custom:
+
+```bash
+curl -sL https://raw.githubusercontent.com/instax-dutta/elden-theme/main/install.sh -o /tmp/sentri-theme.sh && sudo bash /tmp/sentri-theme.sh /path/to/panel
+```
+
+## Features
+
+- Deep violet midnight canvas from `DESIGN.md`
+- Electric lime primary actions
+- Pink and violet status accents
+- Rubik UI typography with Monaco-style console treatment
+- Dark panel surfaces, inputs, tables, buttons, sidebar, topbar, and terminal styling
+
+## Files
 
 - `pterodactyl-sentry-dark.css`
 - `preview.html`
+- `install.sh`
 
-Use the CSS file as the theme override in your Pterodactyl panel build or as the base for a custom style injection.
+## After Install
+
+Clear browser cache or use incognito mode to see the theme.
+
+## Uninstall
+
+Restore from the backup created at `/var/www/sentri-theme-backup-YYYYMMDD-HHMMSS/`.
+
+## License
+
+MIT
