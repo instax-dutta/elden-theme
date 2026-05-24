@@ -17,35 +17,43 @@
       }
 
       body {
-        padding: 24px;
+        padding: 32px 24px;
       }
 
       .frame {
-        max-width: 1400px;
+        max-width: 1320px;
         margin: 0 auto;
         display: grid;
-        grid-template-columns: 280px minmax(0, 1fr);
-        gap: 18px;
+        grid-template-columns: 290px minmax(0, 1fr);
+        gap: 24px;
+        position: relative; /* relative for floating stickers */
       }
 
       .sidebar {
-        min-height: calc(100vh - 48px);
-        padding: 22px;
-        border-radius: 16px;
+        min-height: calc(100vh - 64px);
+        padding: 24px;
+        border-radius: var(--sentri-radius-xl);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
       }
 
       .brand-lockup {
         display: flex;
         flex-direction: column;
-        gap: 6px;
-        margin-bottom: 24px;
+        gap: 8px;
+        margin-bottom: 32px;
       }
 
       .brand-lockup h1 {
         margin: 0;
         font-family: var(--sentri-display);
-        font-size: 30px;
+        font-size: 32px;
         line-height: 1;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        text-transform: lowercase;
       }
 
       .nav-stack {
@@ -57,77 +65,104 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 12px 14px;
+        padding: 12px 16px;
         background: rgba(255, 255, 255, 0.02);
         border: 1px solid transparent;
+        cursor: pointer;
+      }
+
+      .sidebar-footer {
+        margin-top: auto;
+        padding-top: 24px;
+        border-top: 1px solid var(--sentri-hairline-violet);
+        font-size: 12px;
+        color: var(--sentri-text-muted);
       }
 
       .shell {
         display: grid;
-        gap: 18px;
+        gap: 24px;
+        position: relative;
       }
 
       .topbar {
-        padding: 18px 22px;
-        border-radius: 16px;
+        padding: 20px 24px;
+        border-radius: var(--sentri-radius-xl);
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 16px;
+        gap: 20px;
       }
 
       .grid {
         display: grid;
-        grid-template-columns: 1.25fr 0.85fr;
-        gap: 18px;
+        grid-template-columns: 1.35fr 0.85fr;
+        gap: 24px;
       }
 
       .content-card {
-        padding: 22px;
+        padding: 28px;
+        position: relative;
       }
 
       .hero {
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
-        gap: 24px;
-        margin-bottom: 18px;
+        gap: 32px;
+        margin-bottom: 24px;
+      }
+
+      .hero-content {
+        flex: 1;
       }
 
       .hero h2 {
-        margin: 6px 0 12px;
+        margin: 12px 0 16px;
         font-family: var(--sentri-display);
-        font-size: 48px;
-        line-height: 1.02;
+        font-size: 42px;
+        line-height: 1.1;
+        font-weight: 500;
+        letter-spacing: -0.02em;
       }
 
       .stats {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 14px;
-        margin-top: 18px;
+        gap: 16px;
+        margin-top: 24px;
       }
 
       .stat {
-        padding: 16px;
+        padding: 18px;
       }
 
       .stat .label {
-        margin-bottom: 10px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 12px;
+        color: var(--sentri-text-muted);
       }
 
       .stat .value {
-        font-size: 34px;
+        font-size: 36px;
+        font-weight: 500;
+        color: var(--sentri-on-primary);
       }
 
       .two-up {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 18px;
+        gap: 24px;
       }
 
       .activity {
-        padding: 22px;
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
       }
 
       .activity-row {
@@ -135,47 +170,28 @@
         align-items: center;
         justify-content: space-between;
         gap: 16px;
-        padding: 14px 0;
-        border-bottom: 1px solid rgba(207, 207, 219, 0.08);
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(106, 95, 193, 0.1);
+        font-size: 14px;
       }
 
       .activity-row:last-child {
         border-bottom: 0;
       }
 
-      .console {
-        min-height: 232px;
-        padding: 18px;
-        margin-top: 18px;
-      }
-
-      .console p {
-        margin: 0 0 10px;
-        font-family: var(--sentri-code);
-      }
-
-      .terminal-line {
-        display: block;
-        color: #dff0b0;
-      }
-
-      .terminal-line.dim {
-        color: #c8c0d0;
-      }
-
       .buttons {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 12px;
       }
 
       .button,
-      .button-secondary,
-      .button-danger {
-        padding: 11px 15px;
+      .button-secondary {
+        padding: 10px 18px;
         border: 0;
       }
 
+      /* Responsive collapses */
       @media (max-width: 1100px) {
         .frame,
         .grid,
@@ -191,89 +207,193 @@
     </style>
   </head>
   <body>
+    <!-- Starfield Sticker Mascots to give Sentry personality -->
+    <!-- Astro Mascot floating near top boundary of the frame -->
+    <svg viewBox="0 0 100 100" class="sticker" style="position: absolute; right: 40px; top: 110px; width: 110px; height: 110px; z-index: 100; pointer-events: auto;" aria-label="Cute Floating Astronaut Mascot">
+      <defs>
+        <filter id="sticker-shadow" x="-10%" y="-10%" width="120%" height="120%">
+          <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#000000" flood-opacity="0.4" />
+        </filter>
+      </defs>
+      <g filter="url(#sticker-shadow)">
+        <!-- Outer sticker die-cut white boundary -->
+        <path d="M 50,5 C 20,5 5,20 5,50 C 5,80 20,95 50,95 C 80,95 95,80 95,50 C 95,20 80,5 50,5 Z" fill="#ffffff" stroke="#1f1633" stroke-width="4" stroke-linejoin="round" />
+        <!-- Pink inner body -->
+        <circle cx="50" cy="50" r="36" fill="#fa7faa" stroke="#150f23" stroke-width="3" />
+        <!-- Helmet visor in electric lime -->
+        <rect x="28" y="32" width="44" height="26" rx="13" fill="#c2ef4e" stroke="#150f23" stroke-width="3" />
+        <!-- Reflection bubble -->
+        <circle cx="38" cy="40" r="4" fill="#ffffff" />
+        <!-- Small backpack tanks on side -->
+        <rect x="18" y="40" width="10" height="24" rx="4" fill="#6a5fc1" stroke="#150f23" stroke-width="2" />
+        <!-- Tiny astronaut antennas -->
+        <line x1="50" y1="14" x2="50" y2="8" stroke="#150f23" stroke-width="3" />
+        <circle cx="50" cy="6" r="3" fill="#fa7faa" stroke="#150f23" stroke-width="1.5" />
+      </g>
+    </svg>
+
+    <!-- Cone Mascot overlapping sidebar and content card -->
+    <svg viewBox="0 0 100 100" class="sticker" style="position: absolute; left: 260px; bottom: 80px; width: 85px; height: 85px; z-index: 100; pointer-events: auto;" aria-label="Cute Sentry Security Cone Mascot">
+      <g filter="url(#sticker-shadow)">
+        <!-- Outer white die-cut sticker edge -->
+        <path d="M 50,2 L 15,82 C 12,88 18,94 28,94 L 72,94 C 82,94 88,88 85,82 L 50,2 Z" fill="#ffffff" stroke="#1f1633" stroke-width="4" stroke-linejoin="round" />
+        <!-- Cone orange-pink stripes -->
+        <path d="M 50,8 L 22,76 C 20,80 24,84 30,84 L 70,84 C 76,84 80,80 78,76 L 50,8 Z" fill="#fa7faa" stroke="#150f23" stroke-width="3" />
+        <!-- Middle Lime Stripe -->
+        <path d="M 50,30 L 36,62 L 64,62 Z" fill="#c2ef4e" stroke="#150f23" stroke-width="2.5" />
+        <!-- Base black-violet stand -->
+        <ellipse cx="50" cy="85" rx="36" ry="6" fill="#150f23" />
+        <!-- Cute hand-drawn eyes to make it a mascot -->
+        <circle cx="45" cy="48" r="3" fill="#150f23" />
+        <circle cx="55" cy="48" r="3" fill="#150f23" />
+        <path d="M 48,54 Q 50,56 52,54" fill="none" stroke="#150f23" stroke-width="2" stroke-linecap="round" />
+      </g>
+    </svg>
+
     <div class="frame">
+      <!-- Pterodactyl Sidebar Mock -->
       <aside class="sidebar">
-        <div class="brand-lockup">
-          <span class="eyebrow">Sentri-inspired</span>
-          <h1>pterodactyl</h1>
-          <span class="muted">Midnight control for servers that want a sharper edge.</span>
+        <div>
+          <div class="brand-lockup">
+            <span class="eyebrow" style="align-self: flex-start;">Sentri Theme</span>
+            <h1>pterodactyl</h1>
+            <span class="muted">Midnight server orchestration, refined with a radioactive edge.</span>
+          </div>
+
+          <div class="nav-stack">
+            <div class="nav-item active">
+              <span style="font-weight: 600;">Dashboard</span>
+              <span class="badge" style="font-size: 8px; padding: 2px 5px;">01</span>
+            </div>
+            <div class="nav-item">
+              <span>Servers</span>
+              <span class="badge badge--violet" style="font-size: 8px; padding: 2px 5px;">12</span>
+            </div>
+            <div class="nav-item">
+              <span>Allocations</span>
+              <span class="badge badge--violet" style="font-size: 8px; padding: 2px 5px;">04</span>
+            </div>
+            <div class="nav-item">
+              <span>Databases</span>
+              <span class="badge badge--violet" style="font-size: 8px; padding: 2px 5px;">09</span>
+            </div>
+            <div class="nav-item">
+              <span>Activity</span>
+              <span class="badge badge--pink" style="font-size: 8px; padding: 2px 5px;">18</span>
+            </div>
+          </div>
         </div>
 
-        <div class="nav-stack">
-          <div class="nav-item active"><span>Dashboard</span><span>01</span></div>
-          <div class="nav-item"><span>Servers</span><span>12</span></div>
-          <div class="nav-item"><span>Allocations</span><span>04</span></div>
-          <div class="nav-item"><span>Databases</span><span>09</span></div>
-          <div class="nav-item"><span>Activity</span><span>18</span></div>
+        <div class="sidebar-footer">
+          <div style="margin-bottom: 6px; font-weight: 500;">Connection Stable</div>
+          <div class="faint" style="font-size: 11px;">v1.11.3 · Nodes active</div>
         </div>
       </aside>
 
+      <!-- Main Shell Area -->
       <main class="shell">
         <header class="topbar">
           <div>
-            <span class="eyebrow">Panel status</span>
-            <div class="muted">All services green, jobs flowing, no noise.</div>
+            <span class="eyebrow hero-accent">Node: Sentry-US-West</span>
+            <div class="muted" style="margin-top: 4px;">All daemon metrics nominal, pipelines green, zero latency.</div>
           </div>
           <div class="buttons">
-            <button class="button-secondary">Create server</button>
-            <button class="button">Deploy node</button>
+            <button class="button-secondary">Manage backups</button>
+            <button class="button">Deploy server</button>
           </div>
         </header>
 
+        <!-- Hero Feature Card -->
         <section class="card content-card">
           <div class="hero">
-            <div>
-              <span class="badge">Lime primary</span>
-              <h2>Dark, direct, and slightly radioactive.</h2>
-              <p class="muted" style="max-width: 58ch;">
-                A Pterodactyl theme that leans into Sentri's violet midnight base, sharp lime actions,
-                and compact, high-trust surfaces for the kinds of workflows people repeat all day.
+            <div class="hero-content">
+              <span class="badge">Sentry-Inspired</span>
+              <h2>Dark, direct, and slightly <span class="highlight-keyword">radioactive</span>.</h2>
+              <p class="muted" style="max-width: 56ch; line-height: 1.6; font-size: 15px;">
+                A Pterodactyl Panel interface built on Sentry's premium midnight canvas. Accented with neon lime CTAs and hot pink alert nodes, it delivers the high-trust, responsive visual design developers demand.
               </p>
             </div>
-            <div class="surface-lift" style="padding: 16px; min-width: 280px;">
-              <div class="faint">Active allocations</div>
-              <div style="font-family: var(--sentri-display); font-size: 40px; margin: 4px 0 8px;">87%</div>
-              <div class="progress" style="height: 10px;"><div class="progress-bar" style="width: 87%; height: 100%;"></div></div>
+            
+            <!-- Real-time Memory Allocator Lifted Card -->
+            <div class="stat" style="min-width: 280px; flex-shrink: 0; background: linear-gradient(180deg, rgba(66, 32, 130, 0.15) 0%, rgba(21, 15, 35, 0.6) 100%) !important;">
+              <span class="badge badge--violet">Resource Limits</span>
+              <div style="font-family: var(--sentri-display); font-size: 38px; margin: 8px 0 10px; color: var(--sentri-on-primary);">87%</div>
+              <div class="progress" style="margin-bottom: 6px;">
+                <div class="progress-bar" style="width: 87%;"></div>
+              </div>
+              <span class="muted" style="font-size: 12px;">Memory allocation threshold warning</span>
             </div>
           </div>
 
+          <!-- Triple Grid Stats Panel -->
           <div class="stats">
             <div class="stat">
-              <div class="label">CPU</div>
-              <div class="value">62%</div>
-              <div class="muted">steady load</div>
+              <div class="label">CPU Usage</div>
+              <div class="value">64.2%</div>
+              <div class="muted" style="font-size: 12px; margin-top: 4px;">8 Cores allocated</div>
             </div>
             <div class="stat">
-              <div class="label">Memory</div>
+              <div class="label">Memory Load</div>
               <div class="value">14.2 GB</div>
-              <div class="muted">2.1 GB free</div>
+              <div class="muted" style="font-size: 12px; margin-top: 4px;">2.1 GB cache available</div>
             </div>
             <div class="stat">
-              <div class="label">Storage</div>
+              <div class="label">Disk Utilization</div>
               <div class="value">1.8 TB</div>
-              <div class="muted">72% used</div>
+              <div class="muted" style="font-size: 12px; margin-top: 4px;">72% total blocks used</div>
             </div>
           </div>
         </section>
 
+        <!-- Live Shell & Activities Grid -->
         <div class="grid">
-          <section class="card content-card">
-            <span class="eyebrow hero-accent">Live console</span>
-            <div class="console">
-              <p><span class="terminal-line">$ docker ps</span></p>
-              <p><span class="terminal-line dim">CONTAINER ID   IMAGE                 STATUS</span></p>
-              <p><span class="terminal-line">c81f...        ghcr.io/ptero/node    Up 7 hours</span></p>
-              <p><span class="terminal-line">d12a...        ghcr.io/ptero/web     Up 7 hours</span></p>
-              <p><span class="terminal-line">e9bc...        ghcr.io/ptero/db      Up 7 hours</span></p>
+          <!-- Terminal Panel with realistic controls and scanning animations -->
+          <section class="terminal">
+            <div class="console-header-bar">
+              <div class="console-dots">
+                <div class="console-dot close"></div>
+                <div class="console-dot minimize"></div>
+                <div class="console-dot maximize"></div>
+              </div>
+              <span class="console-title">Monaco Terminal - docker shell</span>
+              <span class="eyebrow" style="padding: 2px 6px; font-size: 8px; border-color: rgba(194, 239, 78, 0.35);">Live</span>
+            </div>
+            <div class="console-output-area">
+              <div class="console-scanline"></div>
+              <p class="terminal-line"><span class="terminal-line dim">$ docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Status}}"</span></p>
+              <p class="terminal-line"><span class="terminal-line dim">CONTAINER ID   IMAGE                 STATUS</span></p>
+              <p class="terminal-line success">c81f7ba9f8e1   ghcr.io/ptero/node    Up 7 hours (healthy)</p>
+              <p class="terminal-line success">d12ac0ef382b   ghcr.io/ptero/web     Up 7 hours (healthy)</p>
+              <p class="terminal-line success">e9bc4d620fa9   ghcr.io/ptero/db      Up 7 hours (healthy)</p>
+              <p class="terminal-line"><span class="terminal-line dim">$ systemctl status wings --no-pager</span></p>
+              <p class="terminal-line"><span class="terminal-line dim">● wings.service - Pterodactyl Wings Daemon</span></p>
+              <p class="terminal-line">   Active: active (running) since Sun 2026-05-24 09:00:15 UTC; 7h ago</p>
+              <p class="terminal-line success">   Main PID: 2840 (wings)</p>
+              <p class="terminal-line"><span class="terminal-line dim">$ _</span></p>
             </div>
           </section>
 
+          <!-- Interactive Activities Widget -->
           <section class="activity card">
-            <span class="eyebrow">Recent activity</span>
-            <div class="activity-row"><span>Server rebuilt</span><span class="accent-lime">2m ago</span></div>
-            <div class="activity-row"><span>Database backup completed</span><span class="accent-violet">11m ago</span></div>
-            <div class="activity-row"><span>Allocation swapped</span><span class="accent-pink">24m ago</span></div>
-            <div class="activity-row"><span>Node heartbeat stable</span><span class="muted">1h ago</span></div>
+            <span class="eyebrow" style="align-self: flex-start;">Event Monitor</span>
+            <div style="display: flex; flex-direction: column;">
+              <div class="activity-row">
+                <span style="font-weight: 500;">Wings daemon heartbeat stable</span>
+                <span class="badge" style="font-size: 8px; padding: 2px 6px;">Stable</span>
+              </div>
+              <div class="activity-row">
+                <span>Backup sentri-daily-full.tar.gz</span>
+                <span class="badge badge--violet" style="font-size: 8px; padding: 2px 6px;">11m ago</span>
+              </div>
+              <div class="activity-row">
+                <span>Node allocation swapped [port: 8080]</span>
+                <span class="badge badge--pink" style="font-size: 8px; padding: 2px 6px;">24m ago</span>
+              </div>
+              <div class="activity-row">
+                <span class="muted">Connection handshake success</span>
+                <span class="muted" style="font-size: 12px;">1h ago</span>
+              </div>
+            </div>
           </section>
         </div>
       </main>
