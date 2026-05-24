@@ -18,6 +18,8 @@
             <meta name="msapplication-TileColor" content="#00a300">
             <meta name="msapplication-config" content="/favicons/browserconfig.xml">
             <meta name="theme-color" content="#150f23">
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         @show
 
         @section('user-data')
@@ -38,7 +40,7 @@
             <link rel="stylesheet" href="/themes/sentri-pterodactyl-dark/theme.css?v={{ file_exists(public_path('themes/sentri-pterodactyl-dark/theme.css')) ? filemtime(public_path('themes/sentri-pterodactyl-dark/theme.css')) : time() }}" data-theme="sentri-pterodactyl-dark">
         @show
     </head>
-    <body>
+    <body class="sentri-theme">
         @section('content')
             <div id="app"></div>
         @show
