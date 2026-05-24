@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sentri Pterodactyl Dark Theme Preview</title>
+    <link rel="stylesheet" href="./pterodactyl-sentry-dark.css" />
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+      }
+
+      body {
+        padding: 24px;
+      }
+
+      .frame {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 280px minmax(0, 1fr);
+        gap: 18px;
+      }
+
+      .sidebar {
+        min-height: calc(100vh - 48px);
+        padding: 22px;
+        border-radius: 16px;
+      }
+
+      .brand-lockup {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 24px;
+      }
+
+      .brand-lockup h1 {
+        margin: 0;
+        font-family: var(--sentri-display);
+        font-size: 30px;
+        line-height: 1;
+      }
+
+      .nav-stack {
+        display: grid;
+        gap: 8px;
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid transparent;
+      }
+
+      .shell {
+        display: grid;
+        gap: 18px;
+      }
+
+      .topbar {
+        padding: 18px 22px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1.25fr 0.85fr;
+        gap: 18px;
+      }
+
+      .content-card {
+        padding: 22px;
+      }
+
+      .hero {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 18px;
+      }
+
+      .hero h2 {
+        margin: 6px 0 12px;
+        font-family: var(--sentri-display);
+        font-size: 48px;
+        line-height: 1.02;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 18px;
+      }
+
+      .stat {
+        padding: 16px;
+      }
+
+      .stat .label {
+        margin-bottom: 10px;
+      }
+
+      .stat .value {
+        font-size: 34px;
+      }
+
+      .two-up {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .activity {
+        padding: 22px;
+      }
+
+      .activity-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 0;
+        border-bottom: 1px solid rgba(207, 207, 219, 0.08);
+      }
+
+      .activity-row:last-child {
+        border-bottom: 0;
+      }
+
+      .console {
+        min-height: 232px;
+        padding: 18px;
+        margin-top: 18px;
+      }
+
+      .console p {
+        margin: 0 0 10px;
+        font-family: var(--sentri-code);
+      }
+
+      .terminal-line {
+        display: block;
+        color: #dff0b0;
+      }
+
+      .terminal-line.dim {
+        color: #c8c0d0;
+      }
+
+      .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .button,
+      .button-secondary,
+      .button-danger {
+        padding: 11px 15px;
+        border: 0;
+      }
+
+      @media (max-width: 1100px) {
+        .frame,
+        .grid,
+        .two-up,
+        .stats {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          min-height: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <aside class="sidebar">
+        <div class="brand-lockup">
+          <span class="eyebrow">Sentri-inspired</span>
+          <h1>pterodactyl</h1>
+          <span class="muted">Midnight control for servers that want a sharper edge.</span>
+        </div>
+
+        <div class="nav-stack">
+          <div class="nav-item active"><span>Dashboard</span><span>01</span></div>
+          <div class="nav-item"><span>Servers</span><span>12</span></div>
+          <div class="nav-item"><span>Allocations</span><span>04</span></div>
+          <div class="nav-item"><span>Databases</span><span>09</span></div>
+          <div class="nav-item"><span>Activity</span><span>18</span></div>
+        </div>
+      </aside>
+
+      <main class="shell">
+        <header class="topbar">
+          <div>
+            <span class="eyebrow">Panel status</span>
+            <div class="muted">All services green, jobs flowing, no noise.</div>
+          </div>
+          <div class="buttons">
+            <button class="button-secondary">Create server</button>
+            <button class="button">Deploy node</button>
+          </div>
+        </header>
+
+        <section class="card content-card">
+          <div class="hero">
+            <div>
+              <span class="badge">Lime primary</span>
+              <h2>Dark, direct, and slightly radioactive.</h2>
+              <p class="muted" style="max-width: 58ch;">
+                A Pterodactyl theme that leans into Sentri's violet midnight base, sharp lime actions,
+                and compact, high-trust surfaces for the kinds of workflows people repeat all day.
+              </p>
+            </div>
+            <div class="surface-lift" style="padding: 16px; min-width: 280px;">
+              <div class="faint">Active allocations</div>
+              <div style="font-family: var(--sentri-display); font-size: 40px; margin: 4px 0 8px;">87%</div>
+              <div class="progress" style="height: 10px;"><div class="progress-bar" style="width: 87%; height: 100%;"></div></div>
+            </div>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="label">CPU</div>
+              <div class="value">62%</div>
+              <div class="muted">steady load</div>
+            </div>
+            <div class="stat">
+              <div class="label">Memory</div>
+              <div class="value">14.2 GB</div>
+              <div class="muted">2.1 GB free</div>
+            </div>
+            <div class="stat">
+              <div class="label">Storage</div>
+              <div class="value">1.8 TB</div>
+              <div class="muted">72% used</div>
+            </div>
+          </div>
+        </section>
+
+        <div class="grid">
+          <section class="card content-card">
+            <span class="eyebrow hero-accent">Live console</span>
+            <div class="console">
+              <p><span class="terminal-line">$ docker ps</span></p>
+              <p><span class="terminal-line dim">CONTAINER ID   IMAGE                 STATUS</span></p>
+              <p><span class="terminal-line">c81f...        ghcr.io/ptero/node    Up 7 hours</span></p>
+              <p><span class="terminal-line">d12a...        ghcr.io/ptero/web     Up 7 hours</span></p>
+              <p><span class="terminal-line">e9bc...        ghcr.io/ptero/db      Up 7 hours</span></p>
+            </div>
+          </section>
+
+          <section class="activity card">
+            <span class="eyebrow">Recent activity</span>
+            <div class="activity-row"><span>Server rebuilt</span><span class="accent-lime">2m ago</span></div>
+            <div class="activity-row"><span>Database backup completed</span><span class="accent-violet">11m ago</span></div>
+            <div class="activity-row"><span>Allocation swapped</span><span class="accent-pink">24m ago</span></div>
+            <div class="activity-row"><span>Node heartbeat stable</span><span class="muted">1h ago</span></div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
