@@ -1,0 +1,11 @@
+{
+  "name": "sentri-pterodactyl-dark",
+  "version": "1.0.0",
+  "description": "A Sentry-inspired premium dark theme for Pterodactyl Panel featuring midnight violet canvas and electric lime accents.",
+  "main": "index.js",
+  "scripts": {
+    "build": "yarn build:production"
+  },
+  "author": "instax-dutta",
+  "license": "MIT"
+}

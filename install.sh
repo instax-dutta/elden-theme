@@ -92,7 +92,7 @@ download_bundle() {
 }
 
 resolve_source_dir() {
-    if [[ -f "$SELF_PATH/pterodactyl-sentry-dark.css" ]]; then
+    if [[ -f "$SELF_PATH/resources/views/templates/wrapper.blade.php" ]]; then
         printf '%s\n' "$SELF_PATH"
         return
     fi
@@ -100,7 +100,7 @@ resolve_source_dir() {
     local workdir src_dir
     workdir="$(mktemp -d "$DEFAULT_TMP_DIR/sentri-theme-install.XXXXXX")"
     src_dir="$(download_bundle "$workdir")"
-    [[ -f "$src_dir/pterodactyl-sentry-dark.css" ]] || die "theme bundle is missing pterodactyl-sentry-dark.css"
+    [[ -f "$src_dir/resources/views/templates/wrapper.blade.php" ]] || die "theme bundle is missing wrapper.blade.php"
     printf '%s\n' "$src_dir"
 }
 
@@ -110,45 +110,34 @@ backup_files() {
 
     sudo_cmd mkdir -p "$backup_dir"
 
+    # Backup wrapper.blade.php
     [[ -f "$panel_dir/resources/views/templates/wrapper.blade.php" ]] && sudo_cmd cp -a "$panel_dir/resources/views/templates/wrapper.blade.php" "$backup_dir/wrapper.blade.php"
+    
+    # Backup tailwind.config.js if exists
+    [[ -f "$panel_dir/tailwind.config.js" ]] && sudo_cmd cp -a "$panel_dir/tailwind.config.js" "$backup_dir/tailwind.config.js" || true
+    
+    # Backup theme folder if exists
     [[ -d "$panel_dir/public/themes/$THEME_NAME" ]] && sudo_cmd cp -a "$panel_dir/public/themes/$THEME_NAME" "$backup_dir/" || true
 }
 
-install_theme_css() {
+install_theme_files() {
     local source_dir="$1"
     local panel_dir="$2"
+
+    log "installing theme view templates"
+    sudo_cmd mkdir -p "$panel_dir/resources/views/templates"
+    sudo_cmd cp -a "$source_dir/resources/views/templates/wrapper.blade.php" "$panel_dir/resources/views/templates/wrapper.blade.php"
+
+    log "installing theme public assets"
     local theme_dir="$panel_dir/public/themes/$THEME_NAME"
+    sudo_cmd mkdir -p "$theme_dir"
+    sudo_cmd cp -a "$source_dir/public/themes/$THEME_NAME/theme.css" "$theme_dir/theme.css"
 
-    sudo_cmd install -d "$theme_dir"
-    sudo_cmd install -m 0644 "$source_dir/pterodactyl-sentry-dark.css" "$theme_dir/theme.css"
-}
-
-inject_stylesheet() {
-    local panel_dir="$1"
-    local wrapper="$panel_dir/resources/views/templates/wrapper.blade.php"
-    local marker="sentri-pterodactyl-dark"
-    local link="            <link rel=\"stylesheet\" href=\"/themes/$THEME_NAME/theme.css?v={{ file_exists(public_path('themes/$THEME_NAME/theme.css')) ? filemtime(public_path('themes/$THEME_NAME/theme.css')) : time() }}\" data-theme=\"$marker\">"
-
-    [[ -f "$wrapper" ]] || die "missing wrapper template at $wrapper"
-
-    if sudo_cmd grep -q "data-theme=\"$marker\"" "$wrapper"; then
-        log "stylesheet link already present in wrapper template"
-        return
+    # Copy tailwind.config.js to root directory for build compilation
+    if [[ -f "$source_dir/tailwind.config.js" ]]; then
+        log "copying tailwind.config.js for compilation support"
+        sudo_cmd cp -a "$source_dir/tailwind.config.js" "$panel_dir/tailwind.config.js"
     fi
-
-    local tmp_file
-    tmp_file="$(mktemp "$DEFAULT_TMP_DIR/sentri-wrapper.XXXXXX")"
-
-    awk -v link="$link" '
-        /@show/ && !done {
-            print link
-            done = 1
-        }
-        { print }
-    ' "$wrapper" > "$tmp_file"
-
-    sudo_cmd install -m 0644 "$tmp_file" "$wrapper"
-    rm -f "$tmp_file"
 }
 
 clear_panel_cache() {
@@ -191,20 +180,29 @@ uninstall_theme() {
     local panel_dir="$1"
     local wrapper="$panel_dir/resources/views/templates/wrapper.blade.php"
     local theme_dir="$panel_dir/public/themes/$THEME_NAME"
-    local marker="sentri-pterodactyl-dark"
 
     log "uninstalling theme from $panel_dir"
     
-    if [[ -f "$wrapper" ]]; then
-        if grep -q "data-theme=\"$marker\"" "$wrapper"; then
-            log "removing stylesheet injection from wrapper.blade.php"
+    # Attempt to restore from latest backup folder
+    local latest_backup
+    latest_backup=$(find "$BACKUP_ROOT" -maxdepth 1 -type d -name "sentri-theme-backup-*" | sort -r | head -n 1 || true)
+
+    if [[ -n "$latest_backup" && -f "$latest_backup/wrapper.blade.php" ]]; then
+        log "restoring original wrapper.blade.php from backup: $latest_backup"
+        sudo_cmd cp -a "$latest_backup/wrapper.blade.php" "$wrapper"
+        
+        if [[ -f "$latest_backup/tailwind.config.js" && -f "$panel_dir/tailwind.config.js" ]]; then
+            log "restoring original tailwind.config.js"
+            sudo_cmd cp -a "$latest_backup/tailwind.config.js" "$panel_dir/tailwind.config.js"
+        fi
+    else
+        log "no backup wrapper.blade.php found; removing custom link from existing file"
+        if [[ -f "$wrapper" ]]; then
             local tmp_file
             tmp_file="$(mktemp "$DEFAULT_TMP_DIR/sentri-wrapper-uninstall.XXXXXX")"
-            grep -v "data-theme=\"$marker\"" "$wrapper" > "$tmp_file"
+            grep -v "sentri-pterodactyl-dark" "$wrapper" > "$tmp_file" || true
             sudo_cmd install -m 0644 "$tmp_file" "$wrapper"
             rm -f "$tmp_file"
-        else
-            log "no stylesheet injection found in wrapper.blade.php"
         fi
     fi
 
@@ -258,22 +256,20 @@ main() {
     log "creating backup at $backup_dir"
     backup_files "$panel_dir" "$backup_dir"
 
-    log "installing theme CSS"
-    install_theme_css "$source_dir" "$panel_dir"
-
-    log "injecting stylesheet into Pterodactyl wrapper"
-    inject_stylesheet "$panel_dir"
+    log "copying theme files to panel directory..."
+    install_theme_files "$source_dir" "$panel_dir"
 
     clear_panel_cache "$panel_dir"
     fix_permissions "$panel_dir"
 
-    log "install complete"
+    log "install complete!"
     printf '\n'
     printf 'Panel:   %s\n' "$panel_dir"
     printf 'Backup:  %s\n' "$backup_dir"
     printf 'Theme:   %s\n' "$THEME_NAME"
     printf '\n'
     printf 'Next: hard refresh your browser once to load the new Sentri dark theme.\n'
+    printf 'Optionally: run `yarn install && yarn build:production` in your panel root to compile Tailwind colors!\n'
 }
 
 main "$@"
